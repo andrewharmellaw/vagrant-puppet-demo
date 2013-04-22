@@ -2,7 +2,7 @@ This demo code is tested with Vagrant 1.0.2 and VirtualBox 4.1.10.
 
 This is a simple example of how to build a virtual test environment with Vagrant and Puppet.
 
-The setup contains two virtual machines, one database server with MySQL and one application server with Tomcat 6.
+The setup contains two Centos 5.8 (64 bit) virtual machines, one database server with MySQL and one application server with Tomcat 6.
 
 Simply check it out, chdir into the directory and then run
 
@@ -19,3 +19,6 @@ When you're done, don't forget to stop your virtual boxes with
 or completely remove them with
 
 > vagrant destroy
+
+NOTE: To get things working smoothly, you'll need to:
+* Increase the VM memory (and CPU) of the VNM image (do this via the VirtualBox "settings" menu item once you've run the VM for the first time
