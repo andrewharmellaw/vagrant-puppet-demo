@@ -1,18 +1,36 @@
-group { 'puppet': ensure => 'present' }
+group { 'puppet': 
+  ensure => 'present', 
+}
 
-# update the (outdated) package list
-#exec { "update-package-list":
-#  command => "/usr/bin/sudo /usr/bin/apt-get update",
+#yumrepo { "yum":
+#  proxy => "http://10.23.12.100:8080",
 #}
 
-#class java_7 {
+# Install Oracle JDK.
+class oracle_jdk_6 {
 
-#  package { "openjdk-7-jdk":
-#    ensure => installed,
-#    require => Exec["update-package-list"],
+  file { 'oracle_jdk_rpm':
+    owner => 'root',
+    path => '/var/tmp/jdk.rpm',
+    source => '/vagrant/files/jdk-6u11-linux-i586.rpm',
+  }
+
+  exec { 'install_jdk_rpm':
+    require => File['oracle_jdk_rpm'],
+    command => '/bin/rpm -ivh /var/tmp/jdk.rpm',
+    unless => '/bin/rpm -q jdk',
+  }
+
+}
+  
+#class oracle_java_7 {
+#  package { "java-1.7.0-openjdk-devel":
+#    ensure  => installed,
+#	require => Yumrepo['yum'],
 #  }
-#
 #}
+
+include oracle_jdk_6
 
 #class tomcat_6 {
 
@@ -53,6 +71,6 @@ group { 'puppet': ensure => 'present' }
 #$tomcat_password = '12345'
 #$tomcat_user = 'tomcat-admin'
 
-#include java_7
+#include oracle_java_7
 #include tomcat_6
 

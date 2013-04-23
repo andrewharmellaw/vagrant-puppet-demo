@@ -7,6 +7,9 @@ Vagrant::Config.run do |config|
   config.vm.box = "centos-5.8-x86-64-minimal"
   config.vm.box_url = "http://tag1consulting.com/files/centos-5.8-x86-64-minimal.box"
 
+  # customise the VM
+  config.vm.customize ["modifyvm", :id, "--memory", 2048]
+  
   # config for the appserver box
   config.vm.define "appserver" do |app|
     app.vm.boot_mode = :gui
@@ -14,7 +17,8 @@ Vagrant::Config.run do |config|
     app.vm.host_name = "appserver01.local"
     app.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
-      puppet.manifest_file = "appserver.pp"
+#      puppet.manifest_file = "appserver.pp"
+	  puppet.manifest_file = "test.pp"
     end
   end
 
