@@ -8,9 +8,10 @@ Vagrant::Config.run do |config|
   config.vm.box_url = "http://tag1consulting.com/files/centos-5.8-x86-64-minimal.box"
 
   # customise the VM
-  # config.vm.customize ["modifyvm", :id, "--memory", 2048]
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", 2048]
+  config.vm.customize ["modifyvm", :id, "--memory", 2048]
+  #config.vm.provider :virtualbox do |vb|
+  #  vb.customize ["modifyvm", :id, "--memory", 2048]
+  #end
   
   # config for the appserver box
   config.vm.define "appserver" do |app|
