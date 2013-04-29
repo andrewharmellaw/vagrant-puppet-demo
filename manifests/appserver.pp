@@ -1,10 +1,15 @@
-group { 'puppet': 
+group { 'puppet':  
   ensure => 'present', 
 }
 
-#yumrepo { "yum":
-#  proxy => "http://10.23.12.100:8080",
-#}
+# Push across the yum config
+file { 'yum_conf_default':
+
+  owner => 'root',
+  path => '/etc/yum.conf',
+  source => '/vagrant/files/yum.conf.default',
+  
+}
 
 # Install Oracle JDK.
 class oracle_jdk_6 {
@@ -20,7 +25,17 @@ class oracle_jdk_6 {
     command => '/bin/rpm -ivh /var/tmp/jdk.rpm',
     unless => '/bin/rpm -q jdk',
   }
-
+  
+  # Set the classpath in the default profile
+  file { 'java.profile':
+	owner => 'root',
+	group => 'root',
+	mode => 644,
+	path => '/etc/profile',
+	source => '/vagrant/files/java.profile',
+	require => Exec['install_jdk_rpm'],
+  }
+  
 }
 
 
@@ -85,57 +100,76 @@ class mysql_5_0_96 {
   
 }
 
+# MySQL JDBC Driver
+class jdbc_driver {
+
+  exec { 'mkdir_cordys_jdbc':
+    command => "/bin/mkdir -p /opt/Cordys/JDBC"
+  }
+  
+  file { 'mysql-connector-java-5.0.8.jar':
+	owner => 'root',
+	group => 'root',
+	mode => 755,
+	path => '/opt/Cordys/JDBC/mysql-connector-java-5.0.8-bin.jar',
+	source => '/vagrant/files/mysql-connector-java-5.0.8.jar',
+	require => Exec['mkdir_cordys_jdbc'],
+  }
+  
+  # Create /etc/profile.d/mysql_jdbc.sh
+  file { 'mysql_jdbc.profile':
+	owner => 'root',
+	group => 'root',
+	mode => 644,
+	path => '/etc/profile.d/mysql_jdbc.sh',
+	source => '/vagrant/files/mysql_jdbc.profile',
+	require => File['mysql-connector-java-5.0.8.jar'],
+  }
+}
+
+# Apache
+class apache_2_2_43 {
+  
+  package {'httpd-2.2.3-76.el5.centos':
+	ensure => installed,
+	require => File['yum_conf_default'],
+  }
+  
+  # Send over updated version of httpd.conf with required modules enabled
+  file { 'httpd.conf.mpm':
+	owner => 'root',
+	group => 'root',
+	mode => 644,
+	path => '/etc/httpd/httpd.conf',
+	source => '/vagrant/files/httpd.conf.mpm',
+	require => Package['httpd-2.2.3-76.el5.centos'],
+  }
+  
+  # Add the extra required httpd-mpm.conf
+  # First creating the directory...
+  file { "/etc/httpd/extra":
+    ensure => "directory",
+	require => Package['httpd-2.2.3-76.el5.centos'],
+  }
+  # and then copying over the file...
+  file { 'httpd-mpm.conf.mpm':
+	owner => 'root',
+	group => 'root',
+	mode => 644,
+	path => '/etc/httpd/extra/httpd-mpm.conf',
+	source => '/vagrant/files/httpd-mpm.conf.mpm',
+	require => Package['httpd-2.2.3-76.el5.centos'],
+  }
+  
+  service { 'httpd':
+    enable => true,
+    ensure => running, 
+    require => Package['httpd-2.2.3-76.el5.centos'],
+  }
+  
+}
+
 include oracle_jdk_6  
 include mysql_5_0_96
-  
-#class oracle_java_7 {
-#  package { "java-1.7.0-openjdk-devel":
-#    ensure  => installed,
-#	require => Yumrepo['yum'],
-#  }
-#}
-
-
-
-#class tomcat_6 {
-
-#  package { "tomcat6":
-#    ensure => installed,
-#    require => Package['openjdk-6-jdk'],
-#  }
-  
-#  package { "tomcat6-admin":
-#    ensure => installed,
-#    require => Package['tomcat6'],
-#  }
-  
-#  service { "tomcat6":
-#    ensure => running,
-#    require => Package['tomcat6'],
-#    subscribe => File["mysql-connector.jar", "tomcat-users.xml"]
-#  }
-
-#  file { "tomcat-users.xml":
-#    owner => 'root',
-#    path => '/etc/tomcat6/tomcat-users.xml',
-#    require => Package['tomcat6'],
-#    notify => Service['tomcat6'],
-#    content => template('/vagrant/templates/tomcat-users.xml.erb')
-#  }
-
-#  file { "mysql-connector.jar":
-#    require => Package['tomcat6'],
-#    owner => 'root',
-#    path => '/usr/share/tomcat6/lib/mysql-connector-java-5.1.15.jar',
-#    source => '/vagrant/files/mysql-connector-java-5.1.15.jar'
-#  }
-
-#}
-
-# set variables
-#$tomcat_password = '12345'
-#$tomcat_user = 'tomcat-admin'
-
-#include oracle_java_7
-#include tomcat_6
-
+include jdbc_driver
+include apache_2_2_43
