@@ -9,9 +9,6 @@ Vagrant::Config.run do |config|
 
   # customise the VM
   config.vm.customize ["modifyvm", :id, "--memory", 2048]
-  #config.vm.provider :virtualbox do |vb|
-  #  vb.customize ["modifyvm", :id, "--memory", 2048]
-  #end
   
   # config for the appserver box
   config.vm.define "appserver" do |app|
@@ -21,7 +18,7 @@ Vagrant::Config.run do |config|
     app.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "appserver.pp"
-#	  puppet.manifest_file = "test.pp"
+      puppet.module_path = "modules"
     end
   end
 
@@ -33,6 +30,7 @@ Vagrant::Config.run do |config|
   #  db.vm.provision :puppet do |puppet|
   #    puppet.manifests_path = "manifests"
   #    puppet.manifest_file = "dbserver.pp"
+  #    puppet.module_path = "modules"
   #  end
   #end
 
