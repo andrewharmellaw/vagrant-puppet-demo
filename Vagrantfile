@@ -30,7 +30,7 @@ Vagrant::Config.run do |config|
   #  db.vm.provision :puppet do |puppet|
   #    puppet.manifests_path = "manifests"
   #    puppet.manifest_file = "dbserver.pp"
-  #    puppet.module_path = "modules"
+  #    puppet.module_path => "modules"
   #  end
   #end
 
