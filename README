@@ -12,6 +12,8 @@ to start the two boxes.
 
 Note: If you're on Windows, its likely you'll need to set up SSH properly.  See: http://docs-v1.vagrantup.com/v1/docs/getting-started/ssh.html
 
+Note: If you're behind a firewall, then Vagrant won't be able to able to see the box to download it.  Set an environment property to fix this: "export HTTP_PROXY="host:port"
+
 You'll then have your application server at http://33.33.33.10:8080 and your database server listens on 33.33.33.11. Enjoy!
 
 When you're done, don't forget to stop your virtual boxes with
