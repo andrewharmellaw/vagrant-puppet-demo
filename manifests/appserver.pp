@@ -42,22 +42,27 @@ class oracle_jdk_6 {
 # Install MySQL (Server and Client)
 class mysql_5_0_96 {
 
-  file { 'mysql_server_rpm':
-    owner => 'root',
-    path => '/var/tmp/mysql_server.rpm',
-    source => '/vagrant/files/MySQL-server-community-5.0.96-1.rhel5.x86_64.rpm',
-  }
+#  file { 'mysql_server_rpm':
+#    owner => 'root',
+#    path => '/var/tmp/mysql_server.rpm',
+#    source => '/vagrant/files/MySQL-server-community-5.0.96-1.rhel5.x86_64.rpm',
+#  }
   
-  file { 'mysql_client_rpm':
-    owner => 'root',
-    path => '/var/tmp/mysql_client.rpm',
-    source => '/vagrant/files/MySQL-client-community-5.0.96-1.rhel5.x86_64.rpm',
-  }
+#  file { 'mysql_client_rpm':
+#    owner => 'root',
+#    path => '/var/tmp/mysql_client.rpm',
+#    source => '/vagrant/files/MySQL-client-community-5.0.96-1.rhel5.x86_64.rpm',
+#  }
   
-  exec { 'install_mysql_server':
-    require => File['mysql_server_rpm'],
-	command => '/bin/rpm --nodeps -ivh /var/tmp/mysql_server.rpm',
-	unless => '/bin/rpm -q MySQL-server-community-5.0.96-1.rhel5.x86_64',
+#  exec { 'install_mysql_server':
+#    require => File['mysql_server_rpm'],
+#	command => '/bin/rpm --nodeps -ivh /var/tmp/mysql_server.rpm',
+#	unless => '/bin/rpm -q MySQL-server-community-5.0.96-1.rhel5.x86_64',
+#  }
+
+  package {'MySQL-server-community-5.0.96-1.rhel5.i386':
+	ensure => installed,
+	require => File['yum_conf_default'],
   }
 
 # PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !
@@ -72,10 +77,15 @@ class mysql_5_0_96 {
 #    require => Exec['install_mysql_server'],
 #  }
   
-  exec { 'install_mysql_client':
-    require => File['mysql_client_rpm'],
-	command => '/bin/rpm --nodeps -ivh /var/tmp/mysql_client.rpm',
-	unless => '/bin/rpm -q MySQL-client-community-5.0.96-1.rhel5.x86_64',
+#  exec { 'install_mysql_client':
+#    require => File['mysql_client_rpm'],
+#	command => '/bin/rpm --nodeps -ivh /var/tmp/mysql_client.rpm',
+#	unless => '/bin/rpm -q MySQL-client-community-5.0.96-1.rhel5.x86_64',
+#  }
+
+  package {'MySQL-client-community-5.0.96-1.rhel5.i386':
+	ensure => installed,
+	require => File['yum_conf_default'],
   }
   
   service { 'mysql':
